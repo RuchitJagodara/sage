@@ -741,26 +741,12 @@ class PolynomialSequence_generic(Sequence_generic):
             [  0   2   0   0   2   0   0   2   0   0 126   0   0   0]
             [  0   0   1   2   0   0   2   0   0   0   0 126   0   0]
             sage: v
-            [a^2]
-            [a*b]
-            [b^2]
-            [a*c]
-            [b*c]
-            [c^2]
-            [b*d]
-            [c*d]
-            [d^2]
-            [  a]
-            [  b]
-            [  c]
-            [  d]
-            [  1]
+            (a^2, a*b, b^2, a*c, b*c, c^2, b*d, c*d, d^2, a, b, c, d, 1)
             sage: A*v
-            [        a + 2*b + 2*c + 2*d - 1]
-            [a^2 + 2*b^2 + 2*c^2 + 2*d^2 - a]
-            [      2*a*b + 2*b*c + 2*c*d - b]
-            [        b^2 + 2*a*c + 2*b*d - c]
+            (a + 2*b + 2*c + 2*d - 1, a^2 + 2*b^2 + 2*c^2 + 2*d^2 - a, 2*a*b + 2*b*c + 2*c*d - b, b^2 + 2*a*c + 2*b*d - c)
         """
+        from sage.modules.free_module_element import vector
+        
         R = self.ring()
 
         m = sorted(self.monomials(),reverse=True)
@@ -779,8 +765,7 @@ class PolynomialSequence_generic(Sequence_generic):
             poly = f[x]
             for y in poly.monomials():
                 A[ x , v[y] ] = poly.monomial_coefficient(y)
-
-        return A, Matrix(R,nm,1,m)
+        return A, vector(Matrix(R,nm,1,m))
 
     def subs(self, *args, **kwargs):
         """
