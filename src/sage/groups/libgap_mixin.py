@@ -970,11 +970,17 @@ class GroupMixinLibGAP():
 
         if self.is_simple():
             if self.is_abelian():
-                return self.random_element()
+                return set(self.random_element())
             
             group_elements = self.list()
             n = len(group_elements)
 
             for i in range(n):
                 for j in range(i+1,n):
-                    print(self.gap().IsGeneratorsOfGroup().sage())
+                
+                # TODO :- Yaha pe thik karna h isgenerators function
+                    if self.gap().GroupWithGenerators([group_elements[i],group_elements[j]]):
+                        return set([group_elements[i],group_elements[j]])
+            
+        N = self.gap().MinimalNormalSubgroups()
+        
