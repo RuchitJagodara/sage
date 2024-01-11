@@ -988,7 +988,6 @@ class GroupMixinLibGAP():
             L = L + newL
         return L
 
-
     def minimum_generating_set(self):
         if not self.is_finite():
             raise NotImplementedError("Only implemented for finite groups")
@@ -1001,19 +1000,21 @@ class GroupMixinLibGAP():
 
             n = len(group_elements)
 
+            # Return any two elements that can generate the whole group
+            # It is known that in this particular case there will be two elements which can generate whole group
             for i in range(n):
                 for j in range(i+1,n):
                     if set(group_elements)==set(libgap.GroupByGenerators([group_elements[i],
                                                                           group_elements[j]]).list()):
                         return set([group_elements[i],group_elements[j]])
-        # TODO
-        # Directly take the function from sage when implemented
-        #isko bhi gap se sage me convert karna h permutation group me h direct function but generally available nahi h
+        
+        # TODO: This should be replaced by a function which does not generate all minimal normal subgroups
+        # Instead it generates only one minimal normal subgroup which will be faster
         N = self.gap().MinimalNormalSubgroups()[0]
 
         n = N.gap().MinimalGeneratingSet()
         # yaha pe kuch to gadbad h like list h ye GbyN wo ek group hona chahiye right and tabhi wapis call kar paenge?
-        GbyN = [libgap.Representative(x) for x in self.gap().RightCosets(N)]
+        GbyN = (self.gap().RightCosets(N)).minimal_generating_set()
         g = GbyN.minimum_generating_set()
         l = len(g)
         if N.IsAbelian().sage():
