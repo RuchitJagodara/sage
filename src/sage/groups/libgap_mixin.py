@@ -994,15 +994,17 @@ class GroupMixinLibGAP():
             raise NotImplementedError("Only implemented for finite groups")
 
         if self.is_simple():
-            if self.is_abelian():
-                return set(self.random_element())
-            
             group_elements = self.list()
+
+            if self.is_abelian():
+                return set(group_elements[1])
+
             n = len(group_elements)
+
             for i in range(n):
                 for j in range(i+1,n):
-                # TODO :- Yaha pe thik karna h isgenerators function if condition wala
-                    if self.gap().GroupWithGenerators([group_elements[i],group_elements[j]]).sage():
+                    if set(group_elements)==set(libgap.GroupByGenerators([group_elements[i],
+                                                                          group_elements[j]]).list()):
                         return set([group_elements[i],group_elements[j]])
         # TODO
         # Directly take the function from sage when implemented
@@ -1022,7 +1024,7 @@ class GroupMixinLibGAP():
                 for j in range(m):
                     modifeid_g = g[:i] + [g[i]*n[j]] + g[i+1:]
                     # yaha pe bhi isgenerator wala function
-                    if isgenerator(modifeid_g,slef):
+                    if isgenerator(modifeid_g,self):
                         return modifeid_g
             return g+N[1]
         # explode me not necessary ki first one is identity only and another thing explode use karna h ya nahi because it consumes lot of space
