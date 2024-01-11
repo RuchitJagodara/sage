@@ -964,6 +964,31 @@ class GroupMixinLibGAP():
         """
         return self.gap().IsomorphismGroups(H.gap()) != libgap.fail
     
+    def explode(g:list,N:list,t):
+        """
+            g : list of generators for some arbatrory group G
+            N : A list of elements of subgroup N of G
+        """
+        L = [g]
+        if not isinstance(N,list):
+            N = N.list()
+        N = N[1:]
+        if t > len(g):
+            t = len(g)
+        for i in range(t):
+            newL = []
+            for g in L:
+            	for j in range(len(N)):
+                    x = g[:i]
+                    y = g[i]
+                    y = y*(N[j])
+                    x = x + [y]
+                    x = x + g[i+1:]
+                    newL.append(x)
+            L = L + newL
+        return L
+
+
     def minimum_generating_set(self):
         if not self.is_finite():
             raise NotImplementedError("Only implemented for finite groups")
@@ -974,13 +999,42 @@ class GroupMixinLibGAP():
             
             group_elements = self.list()
             n = len(group_elements)
-
             for i in range(n):
                 for j in range(i+1,n):
-                
-                # TODO :- Yaha pe thik karna h isgenerators function
-                    if self.gap().GroupWithGenerators([group_elements[i],group_elements[j]]):
+                # TODO :- Yaha pe thik karna h isgenerators function if condition wala
+                    if self.gap().GroupWithGenerators([group_elements[i],group_elements[j]]).sage():
                         return set([group_elements[i],group_elements[j]])
-            
-        N = self.gap().MinimalNormalSubgroups()
-        
+        # TODO
+        # Directly take the function from sage when implemented
+        #isko bhi gap se sage me convert karna h permutation group me h direct function but generally available nahi h
+        N = self.gap().MinimalNormalSubgroups()[0]
+
+        n = N.gap().MinimalGeneratingSet()
+        # yaha pe kuch to gadbad h like list h ye GbyN wo ek group hona chahiye right and tabhi wapis call kar paenge?
+        GbyN = [libgap.Representative(x) for x in self.gap().RightCosets(N)]
+        g = GbyN.minimum_generating_set()
+        l = len(g)
+        if N.IsAbelian().sage():
+            # yaha pe bhi isgenerator wala function
+            if isgenerator(g,self):
+                return g
+            for i in range(l):
+                for j in range(m):
+                    modifeid_g = g[:i] + [g[i]*n[j]] + g[i+1:]
+                    # yaha pe bhi isgenerator wala function
+                    if isgenerator(modifeid_g,slef):
+                        return modifeid_g
+            return g+N[1]
+        # explode me not necessary ki first one is identity only and another thing explode use karna h ya nahi because it consumes lot of space
+        t = 13/5 + log(card(G))/log(card(N))
+        if t <= l :
+            for candidate_gen in explode(g,N,t):
+                # same problem with isgenerator function
+                if isGenerator(candidate_gen, G):
+                    return set(candidate_gen)
+        for candidate_gen0 in explode(g,N,l):
+            for nl in N:
+                candidate_gen = candidate_gen0 + {nl}
+                # Same problem
+                if isGenerator(candidate_gen, G):
+                    return candidate_gen
