@@ -707,6 +707,34 @@ class PolynomialSequence_generic(Sequence_generic):
         RRR = PolynomialRing(K,r,tuple(Ts),order='negdeglex')
         return RRR.ideal(JJ.gens())
 
+    def coefficients_monomials(self, order=None, sparse=True):
+        from sage.modules.free_module_element import vector
+        from sage.matrix.constructor import Matrix
+        
+        R = self.ring()
+        f = tuple(self)
+        nf = len(f)
+
+        if order==None:
+            m = sorted(self.monomials(),reverse=True)
+        else:
+            if isinstance(order, (list, tuple)):
+                m = order
+            else:
+                raise ValueError("order argument can only accept list or tuple.")
+        nm = len(m)
+
+        #construct dictionary for fast lookups
+        v = dict( zip( m , range(len(m)) ) )
+
+        A = Matrix( R.base_ring(), nf, nm, sparse=sparse )
+
+        for x in range( nf ):
+            poly = f[x]
+            for y in poly.monomials():
+                A[ x , v[y] ] = poly.monomial_coefficient(y)
+        return A, vector(m)
+
     def coefficient_matrix(self, sparse=True):
         """
         Return tuple ``(A,v)`` where ``A`` is the coefficient matrix
