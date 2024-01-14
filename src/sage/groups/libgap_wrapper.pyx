@@ -436,13 +436,14 @@ class ParentLibGAP(SageObject):
         return self.gens()[i]
 
     def minimum_generating_set(self):
-        if not self.is_finite():
+        from sage.groups.libgap_mixin import GroupMixinLibGAP
+        if not self.gap().IsFinite().sage():
             raise NotImplementedError("Only implemented for finite groups")
 
-        if self.is_simple():
-            group_elements = self.list()
+        if self.gap().IsSimpleGroup().sage():
+            group_elements = GroupMixinLibGAP.list(self)
 
-            if self.is_abelian():
+            if self.gap().IsAbelian().sage():
                 return set(group_elements[1])
 
             n = len(group_elements)
@@ -454,12 +455,12 @@ class ParentLibGAP(SageObject):
                     if set(group_elements)==set(libgap.GroupByGenerators([group_elements[i],
                                                                           group_elements[j]]).list()):
                         return set([group_elements[i],group_elements[j]])
-        
         # TODO: This should be replaced by a function which does not generate all minimal normal subgroups
         # Instead it generates only one minimal normal subgroup which will be faster
         N = self.gap().MinimalNormalSubgroups()[0]
 
         n = N.gap().MinimalGeneratingSet()
+        return n
         # yaha pe kuch to gadbad h like list h ye GbyN wo ek group hona chahiye right and tabhi wapis call kar paenge?
         GbyN = ParentLibGAP.minimum_generating_set(self.gap().RightCosets(N))
         g = GbyN.minimum_generating_set()
