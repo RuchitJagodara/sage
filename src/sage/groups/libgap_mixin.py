@@ -1014,7 +1014,7 @@ class GroupMixinLibGAP():
 
         n = N.gap().MinimalGeneratingSet()
         # yaha pe kuch to gadbad h like list h ye GbyN wo ek group hona chahiye right and tabhi wapis call kar paenge?
-        GbyN = (self.gap().RightCosets(N)).minimal_generating_set()
+        GbyN = ParentLibGAP.minimum_generating_set(self.gap().RightCosets(N))
         g = GbyN.minimum_generating_set()
         l = len(g)
         if N.IsAbelian().sage():

@@ -435,6 +435,59 @@ class ParentLibGAP(SageObject):
             raise ValueError('i must be in range(ngens)')
         return self.gens()[i]
 
+    def minimum_generating_set(self):
+        if not self.is_finite():
+            raise NotImplementedError("Only implemented for finite groups")
+
+        if self.is_simple():
+            group_elements = self.list()
+
+            if self.is_abelian():
+                return set(group_elements[1])
+
+            n = len(group_elements)
+
+            # Return any two elements that can generate the whole group
+            # It is known that in this particular case there will be two elements which can generate whole group
+            for i in range(n):
+                for j in range(i+1,n):
+                    if set(group_elements)==set(libgap.GroupByGenerators([group_elements[i],
+                                                                          group_elements[j]]).list()):
+                        return set([group_elements[i],group_elements[j]])
+        
+        # TODO: This should be replaced by a function which does not generate all minimal normal subgroups
+        # Instead it generates only one minimal normal subgroup which will be faster
+        N = self.gap().MinimalNormalSubgroups()[0]
+
+        n = N.gap().MinimalGeneratingSet()
+        # yaha pe kuch to gadbad h like list h ye GbyN wo ek group hona chahiye right and tabhi wapis call kar paenge?
+        GbyN = ParentLibGAP.minimum_generating_set(self.gap().RightCosets(N))
+        g = GbyN.minimum_generating_set()
+        l = len(g)
+        if N.IsAbelian().sage():
+            # yaha pe bhi isgenerator wala function
+            if isgenerator(g,self):
+                return g
+            for i in range(l):
+                for j in range(m):
+                    modifeid_g = g[:i] + [g[i]*n[j]] + g[i+1:]
+                    # yaha pe bhi isgenerator wala function
+                    if isgenerator(modifeid_g,self):
+                        return modifeid_g
+            return g+N[1]
+        # explode me not necessary ki first one is identity only and another thing explode use karna h ya nahi because it consumes lot of space
+        t = 13/5 + log(card(G))/log(card(N))
+        if t <= l :
+            for candidate_gen in explode(g,N,t):
+                # same problem with isgenerator function
+                if isGenerator(candidate_gen, G):
+                    return set(candidate_gen)
+        for candidate_gen0 in explode(g,N,l):
+            for nl in N:
+                candidate_gen = candidate_gen0 + {nl}
+                # Same problem
+                if isGenerator(candidate_gen, G):
+                    return candidate_gen
     @cached_method
     def one(self):
         """
