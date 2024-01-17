@@ -435,15 +435,68 @@ class ParentLibGAP(SageObject):
             raise ValueError('i must be in range(ngens)')
         return self.gens()[i]
 
+    @cached_method
+    def list(self):
+        """
+        List all elements of this group.
+
+        OUTPUT:
+
+        A tuple containing all group elements in a random but fixed
+        order.
+        """
+        if not self._libgap_().IsFinite():
+            raise NotImplementedError('group must be finite')
+        return tuple(self.element_class(self, g) for g in self._libgap_().AsList())
+
+    def is_GroupByGenerators(self, generators):
+        """
+        Returns true if given generators are able to generate whole group(i.e. self).
+        """
+        group_elements = set(self.list())
+        group_made_by_generators = set([self.element_class(self, g) 
+                                                for g in libgap.GroupByGenerators(generators).AsList()])
+        return group_elements==group_made_by_generators
+
+    def my_function(self, g, N, t):
+        """
+        Returns all possible combinations, I think this can be included in the minimum_generating_set function only because
+        it is unnecessary for other things.
+        g : list of generators for some arbatrory group G
+        N : A list of elements of subgroup N of G
+        """
+        L = [g]
+        if not isinstance(N,list):
+            N = N.list()
+        N = N[1:]
+        if t > len(g):
+            t = len(g)
+        for i in range(t):
+            newL = []
+            for g in L:
+            	for j in range(len(N)):
+                    x = g[:i]
+                    y = g[i]
+                    y = y*(N[j])
+                    x = x + [y]
+                    x = x + g[i+1:]
+                    newL.append(x)
+            L = L + newL
+        return L
+
+
     def minimum_generating_set(self):
-        from sage.groups.libgap_mixin import GroupMixinLibGAP
-        if not self._libgap.IsFinite():
+        """
+        Returns the minimum generating set of self
+        """
+        import numpy as np
+        if not self._libgap_().IsFinite():
             raise NotImplementedError("Only implemented for finite groups")
 
-        if self._libgap.IsSimpleGroup():
-            group_elements = GroupMixinLibGAP.list(self)
+        if self._libgap_().IsSimpleGroup():
+            group_elements = tuple(self.list())
 
-            if self._libgap.IsAbelian():
+            if self._libgap_().IsAbelian():
                 return set(group_elements[1])
 
             n = len(group_elements)
@@ -452,43 +505,45 @@ class ParentLibGAP(SageObject):
             # It is known that in this particular case there will be two elements which can generate whole group
             for i in range(n):
                 for j in range(i+1,n):
-                    if set(group_elements)==set(libgap.GroupByGenerators([group_elements[i],
-                                                                          group_elements[j]]).list()):
+                    if self.is_GroupByGenerators([group_elements[i],group_elements[j]]):
                         return set([group_elements[i],group_elements[j]])
+
         # TODO: This should be replaced by a function which does not generate all minimal normal subgroups
         # Instead it generates only one minimal normal subgroup which will be faster
-        N = self._libgap.MinimalNormalSubgroups()[0]
-
+        N = self._libgap_().MinimalNormalSubgroups()[0]
         n = N.MinimalGeneratingSet()
-        # yaha pe kuch to gadbad h like list h ye GbyN wo ek group hona chahiye right and tabhi wapis call kar paenge?
-        GbyN = ParentLibGAP.minimum_generating_set(self._libgap.RightCosets(N))
-        return GbyN
-        g = GbyN.minimum_generating_set()
+
+        # ERROR:- Don't know how to make a quotient group, here. 
+        GbyN = (Quotient_group(G, N)).minimum_generating_set()
+
+        g = representative(GbyN) # ERROR:- Don't know how to find representative elements of GbyN
         l = len(g)
+        m = len(self._subgroup_constructor(N).list())
+
         if N.IsAbelian():
-            # yaha pe bhi isgenerator wala function
-            if isgenerator(g,self):
+            if self.is_GroupByGenerators(g):
                 return g
             for i in range(l):
                 for j in range(m):
                     modifeid_g = g[:i] + [g[i]*n[j]] + g[i+1:]
-                    # yaha pe bhi isgenerator wala function
-                    if isgenerator(modifeid_g,self):
+                    
+                    if self.is_GroupByGenerators(modifeid_g):
                         return modifeid_g
+
             return g+N[1]
-        # explode me not necessary ki first one is identity only and another thing explode use karna h ya nahi because it consumes lot of space
-        t = 13/5 + log(card(G))/log(card(N))
+
+        t = 13/5 + np.log(self.cardinality())/np.log(N.cardinality())
         if t <= l :
-            for candidate_gen in explode(g,N,t):
-                # same problem with isgenerator function
-                if isGenerator(candidate_gen, G):
+            for candidate_gen in self.my_function(g,N,t):
+                if self.is_GroupByGenerators(candidate_gen):
                     return set(candidate_gen)
-        for candidate_gen0 in explode(g,N,l):
+
+        for candidate_gen0 in self.my_function(g,N,l):
             for nl in N:
                 candidate_gen = candidate_gen0 + {nl}
-                # Same problem
-                if isGenerator(candidate_gen, G):
+                if self.is_GroupByGenerators(candidate_gen):
                     return candidate_gen
+
     @cached_method
     def one(self):
         """

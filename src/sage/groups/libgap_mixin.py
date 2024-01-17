@@ -963,27 +963,3 @@ class GroupMixinLibGAP():
             (False, False, False)
         """
         return self.gap().IsomorphismGroups(H.gap()) != libgap.fail
-    
-    def explode(g, N, t):
-        """
-            g : list of generators for some arbatrory group G
-            N : A list of elements of subgroup N of G
-        """
-        L = [g]
-        if not isinstance(N,list):
-            N = N.list()
-        N = N[1:]
-        if t > len(g):
-            t = len(g)
-        for i in range(t):
-            newL = []
-            for g in L:
-            	for j in range(len(N)):
-                    x = g[:i]
-                    y = g[i]
-                    y = y*(N[j])
-                    x = x + [y]
-                    x = x + g[i+1:]
-                    newL.append(x)
-            L = L + newL
-        return L
