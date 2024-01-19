@@ -514,8 +514,10 @@ class ParentLibGAP(SageObject):
         n = N.MinimalGeneratingSet()
 
         # ERROR:- Don't know how to make a quotient group, here. 
+        # This will give us a minimum generating set in the form {g1N, . . . , glN}. 
         GbyN = (Quotient_group(G, N)).minimum_generating_set()
 
+        # Now we want to find g1, g2, ... from GbyN
         g = representative(GbyN) # ERROR:- Don't know how to find representative elements of GbyN
         l = len(g)
         m = len(self._subgroup_constructor(N).list())
