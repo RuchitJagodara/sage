@@ -166,10 +166,42 @@ def is_linearly_dependent(polys) -> bool:
         False
         sage: is_linearly_dependent([])
         False
+
+    TESTS:
+
+    Check that it is working fine for finite rings (:trac:`37075`)::
+
+        sage: R.<a> = PolynomialRing(GF(3))
+        sage: li = [a^723 + 2*a^675 + a^579 + 2*a^555 + a^507 + 2*a^459 + a^435 + a^411 + 2*a^339 + 2*a^315 + a^291 + a^195 + 2*a^171
+        ....: + a^147 + a^99,
+        ....:  a^723 + a^699 + a^675 + 2*a^651 + a^627 + a^603 + a^507 + a^435 + a^411 + 2*a^363 + a^315 + 2*a^291 + a^243 + a^219 + a
+        ....: ^195 + 2*a^123 + a^75,
+        ....:  a^723 + 2*a^699 + 2*a^675 + a^627 + a^603 + 2*a^507 + 2*a^459 + a^411 + a^387 + 2*a^363 + 2*a^291 + 2*a^267 + a^219 + 2
+        ....: *a^171 + a^147 + 2*a^123 + 2*a^75 + 2*a^27,
+        ....:  a^723 + a^699 + a^651 + a^579 + 2*a^555 + 2*a^507 + a^459 + a^411 + a^387 + 2*a^339 + a^315 + a^291 + 2*a^267 + 2*a^243
+        ....:  + a^171 + 2*a^147 + a^99 + a^75 + 2*a^27]
+        sage: is_linearly_dependent(li)
+        True
+
     """
+    from sage.matrix.constructor import matrix
+
     if not polys:
         return False
-    M = coefficient_matrix(polys).echelon_form()
+    R = polys[0].base_ring()
+    mons = set()
+    for each in polys:
+        mons = mons.union(each.monomials())
+    lp = len(polys)
+    mons = sorted(list(mons), reverse=True)
+    M = matrix(R, lp, len(mons))
+
+    for i in range(lp):
+        imons = polys[i].monomials()
+        icoeffs = polys[i].coefficients()
+        for j in range(len(imons)):
+            M[i, mons.index(imons[j])] = icoeffs[j]*imons[j]
+    M = M.echelon_form()
     return any(M.row(each).is_zero() for each in range(M.nrows()))
 
 
