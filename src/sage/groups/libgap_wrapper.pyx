@@ -458,31 +458,31 @@ class ParentLibGAP(SageObject):
                                                 for g in libgap.GroupByGenerators(generators).AsList()])
         return group_elements==group_made_by_generators
 
-    def my_function(self, g, N, t):
-        """
-        Returns all possible combinations, I think this can be included in the minimum_generating_set function only because
-        it is unnecessary for other things.
-        g : list of generators for some arbatrory group G
-        N : A list of elements of subgroup N of G
-        """
-        L = [g]
-        if not isinstance(N,list):
-            N = N.list()
-        N = N[1:]
-        if t > len(g):
-            t = len(g)
-        for i in range(t):
-            newL = []
-            for g in L:
-            	for j in range(len(N)):
-                    x = g[:i]
-                    y = g[i]
-                    y = y*(N[j])
-                    x = x + [y]
-                    x = x + g[i+1:]
-                    newL.append(x)
-            L = L + newL
-        return L
+#    def my_function(self, g, N, t):
+#        """
+#        Returns all possible combinations, I think this can be included in the minimum_generating_set function only because
+#        it is unnecessary for other things.
+#        g : list of generators for some arbatrory group G
+#        N : A list of elements of subgroup N of G
+#        """
+#        L = [g]
+#        if not isinstance(N,list):
+#            N = N.list()
+#        N = N[1:]
+#        if t > len(g):
+#            t = len(g)
+#        for i in range(t):
+#            newL = []
+#            for g in L:
+#            	for j in range(len(N)):
+#                    x = g[:i]
+#                    y = g[i]
+#                    y = y*(N[j])
+#                    x = x + [y]
+#                    x = x + g[i+1:]
+#                    newL.append(x)
+#            L = L + newL
+#        return L
 
 
     def minimum_generating_set(self):
@@ -515,10 +515,10 @@ class ParentLibGAP(SageObject):
 
         # ERROR:- Don't know how to make a quotient group, here. 
         # This will give us a minimum generating set in the form {g1N, . . . , glN}. 
-        GbyN = (Quotient_group(self, N)).minimum_generating_set()
-
-        # Now we want to find g1, g2, ... from GbyN (which will be a set like {g1N, g2N, g3N, ...})
-        g = representative(GbyN) # ERROR:- Don't know how to find representative elements of GbyN
+        GbyN_set = (self.quotient(N)).minimum_generating_set()
+        return GbyN_set 
+        # Now we want to find g1, g2, ... from GbyN_set (which will be a set like {g1N, g2N, g3N, ...})
+        g = representative(GbyN_set) # ERROR:- Don't know how to find representative elements of GbyN
         l = len(g)
         m = len(self._subgroup_constructor(N).list())
 
@@ -528,7 +528,7 @@ class ParentLibGAP(SageObject):
             for i in range(l):
                 for j in range(m):
                     modifeid_g = g[:i] + [g[i]*n[j]] + g[i+1:]
-                    
+
                     if self.is_GroupByGenerators(modifeid_g):
                         return modifeid_g
 
