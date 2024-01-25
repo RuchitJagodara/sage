@@ -345,6 +345,7 @@ class ParentLibGAP(SageObject):
         """
         return self._libgap._repr_()
 
+    @cached_method
     def minimal_normal_subgroups(self):
         """
         Return the nontrivial minimal normal subgroups of ``self``.
@@ -483,7 +484,6 @@ class ParentLibGAP(SageObject):
                     newL.append(x)
             L = L + newL
         return L
-
 
     def minimum_generating_set(self):
         """
