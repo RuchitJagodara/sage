@@ -510,15 +510,17 @@ class ParentLibGAP(SageObject):
 
         # TODO: This should be replaced by a function which does not generate all minimal normal subgroups
         # Instead it generates only one minimal normal subgroup which will be faster
-        N = self._libgap_().MinimalNormalSubgroups()[0]
+        N = self.minimal_normal_subgroups()[0]
         n = N.MinimalGeneratingSet()
 
         # ERROR:- Don't know how to make a quotient group, here. 
         # This will give us a minimum generating set in the form {g1N, . . . , glN}. 
         GbyN_set = (self.quotient(N)).minimum_generating_set()
-        return GbyN_set 
         # Now we want to find g1, g2, ... from GbyN_set (which will be a set like {g1N, g2N, g3N, ...})
-        g = representative(GbyN_set) # ERROR:- Don't know how to find representative elements of GbyN
+        g = []
+        N_next = ()
+        for ele in self.list():
+            
         l = len(g)
         m = len(self._subgroup_constructor(N).list())
 
