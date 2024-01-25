@@ -458,31 +458,31 @@ class ParentLibGAP(SageObject):
                                                 for g in libgap.GroupByGenerators(generators).AsList()])
         return group_elements==group_made_by_generators
 
-#    def my_function(self, g, N, t):
-#        """
-#        Returns all possible combinations, I think this can be included in the minimum_generating_set function only because
-#        it is unnecessary for other things.
-#        g : list of generators for some arbatrory group G
-#        N : A list of elements of subgroup N of G
-#        """
-#        L = [g]
-#        if not isinstance(N,list):
-#            N = N.list()
-#        N = N[1:]
-#        if t > len(g):
-#            t = len(g)
-#        for i in range(t):
-#            newL = []
-#            for g in L:
-#            	for j in range(len(N)):
-#                    x = g[:i]
-#                    y = g[i]
-#                    y = y*(N[j])
-#                    x = x + [y]
-#                    x = x + g[i+1:]
-#                    newL.append(x)
-#            L = L + newL
-#        return L
+    def my_function(self, g, N, t):
+        """
+        Returns all possible combinations, I think this can be included in the minimum_generating_set function only because
+        it is unnecessary for other things.
+        g : list of generators for some arbatrory group G
+        N : A list of elements of subgroup N of G
+        """
+        L = [g]
+        if not isinstance(N,list):
+            N = N.list()
+        N = N[1:]
+        if t > len(g):
+            t = len(g)
+        for i in range(t):
+            newL = []
+            for g in L:
+                for j in range(len(N)):
+                    x = g[:i]
+                    y = g[i]
+                    y = y*(N[j])
+                    x = x + [y]
+                    x = x + g[i+1:]
+                    newL.append(x)
+            L = L + newL
+        return L
 
 
     def minimum_generating_set(self):
