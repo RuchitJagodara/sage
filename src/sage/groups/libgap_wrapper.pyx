@@ -514,18 +514,22 @@ class ParentLibGAP(SageObject):
         n = N._libgap_().MinimalGeneratingSet()
         GbyN = self.quotient(N)
 
-        # ERROR:- Don't know how to make a quotient group, here. 
-        # This will give us a minimum generating set in the form {g1N, . . . , glN}. 
         GbyN_set = (GbyN).minimum_generating_set()
-        # Now we want to find g1, g2, ... from GbyN_set (which will be a set like {g1N, g2N, g3N, ...})
-        g = []
+
+        g = set()
         N_next = GbyN.minimal_normal_subgroups()[0]
         for ele in self.list():
             s = set()
             for each in N_next:
                 s.add(ele*each)
             if s.issubset(GbyN_set):
-                g.append(ele)
+                g.add(ele)
+            s2 = set()
+            for each in N_next:
+                s2.add(each*ele)
+            if s2.issubset(GbyN_set):
+                g.add(ele)
+        g = list(g)
         # Now we have g1, g2, ... in g
         l = len(g)
         m = len(self._subgroup_constructor(N).list())
