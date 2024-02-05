@@ -963,3 +963,116 @@ class GroupMixinLibGAP():
             (False, False, False)
         """
         return self.gap().IsomorphismGroups(H.gap()) != libgap.fail
+
+def is_GroupByGenerators(group, generators):
+    """
+    Returns true if given generators are able to generate whole group(i.e. self).
+    """
+    from sage.libs.gap.element import GapElement
+    if not isinstance(group, GapElement):
+        group = group._libgap_()
+    group_elements = set(group.AsList())
+    group_made_by_generators = set(libgap.GroupByGenerators(generators).AsList())
+    return group_elements==group_made_by_generators
+
+
+
+@cached_method
+def minimum_generating_set(group, gap_based = False):
+    """
+    Return a minimum generating set of ``self``.
+    EXAMPLES::
+        
+    """
+    from copy import copy
+    from sage.misc.functional import log
+    from sage.libs.gap.element import GapElement
+
+    if not isinstance(group, GapElement):
+        group = group._libgap_()
+
+    if not group.IsFinite().sage():
+        raise NotImplementedError("Only implemented for finite groups")
+
+    if group.IsCyclic().sage():
+        # Confirm that we can return a identity element in case of a singleton set
+        for ele in group.AsList():
+            if is_GroupByGenerators(group,[ele]):
+                return set([ele])
+
+    if group.IsSimple().sage():
+        group_elements = group.AsList()
+        if group.IsAbelian().sage():
+            for each in group_elements:
+                if is_GroupByGenerators(group,[each]):
+                    return set([each])
+            print("Joshi was right !")
+            exit(0)
+        n = len(group_elements)
+        # Return any two elements that can generate the whole group
+        # It is known that in this particular case there will be two elements which can generate whole group
+        for i in range(n):
+            for j in range(i+1,n):
+                if is_GroupByGenerators(group,[group_elements[i],group_elements[j]]):
+                    return set([group_elements[i],group_elements[j]])
+    # TODO: This should be replaced by a function which does not generate all minimal normal subgroups
+    # Instead it generates only one minimal normal subgroup which will be faster
+    N = group.MinimalNormalSubgroups()[0]
+    n = N.MinimalGeneratingSet()
+    phi = group.NaturalHomomorphismByNormalSubgroup(N)
+    GbyN = phi.ImagesSource() 
+    GbyN_set = minimum_generating_set(GbyN, gap_based = True)
+    # find representatives from GbyN_set
+    # g1N_next, g2N_next, ... in GbyN_set
+    g = [phi.PreImagesRepresentative(g) for g in list(GbyN_set)]
+    # Now we have g1, g2, ... in g
+
+    l = len(g)
+    m = len(n)
+    if N.IsAbelian():
+        if is_GroupByGenerators(group,g):
+            return set(g)
+        for i in range(l):
+            for j in range(m):
+                modifeid_g = g[:i] + [g[i]*n[j]] + g[i+1:]
+                if is_GroupByGenerators(group, modifeid_g):
+                    return set(modifeid_g)
+                
+        assert is_GroupByGenerators(group,g+[N.AsList()[1]])
+        return set(g+[N.AsList()[1]])
+
+    def my_function(g, N_old, t):
+        """
+        Returns all possible combinations, I think this can be included in the minimum_generating_set function only because
+        it is unnecessary for other things.
+        g : list of generators for some arbatrory group G
+        N : A list of elements of subgroup N of G
+        """
+        L = [g]
+        N = [ele for ele in N_old]
+        N = N[1:]
+        if t > len(g):
+            t = len(g)
+        for i in range(t):
+            newL = []
+            for g in L:
+                for j in range(len(N)):
+                    x = g[:i]
+                    y = g[i]
+                    y = y*(N[j])
+                    x = x + [y]
+                    x = x + g[i+1:]
+                    newL.append(x)
+            L = L + newL
+        return L
+
+    t = 13/5 + log(group.Size().sage(), 2)/log(N.Size().sage(), 2)
+    if t <= l :
+        for candidate_gen in my_function(g,N.AsList(),t):
+            if is_GroupByGenerators(group, candidate_gen):
+                return set(candidate_gen)
+    for candidate_gen0 in my_function(g,N.AsList(),l):
+        for nl in N.AsList():
+            candidate_gen = set(candidate_gen0).union({nl})
+            if is_GroupByGenerators(group, list(candidate_gen)):
+                return set(candidate_gen)
