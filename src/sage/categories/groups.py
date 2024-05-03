@@ -463,7 +463,6 @@ class Groups(CategoryWithAxiom):
             ....:     for i in range(n-1):
             ....:         G = G.DirectProduct(A5)
             ....:     return G
-            ....: 
             sage: G = A_5_to_n(7)
             sage: g = G.minimum_generating_set()
             sage: g
