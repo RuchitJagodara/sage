@@ -453,28 +453,26 @@ class Groups(CategoryWithAxiom):
 
         def minimum_generating_set(self):
             """
-            Return a list of the minimum generating set of this group.
+            Returns a list of the minimum generating set of this group.
 
             EXAMPLES::
-            ```
-            sage: def A_5_to_n(n):
-            ....:     A5 = AlternatingGroup(5).gap()
-            ....:     G = A5
-            ....:     for i in range(n-1):
-            ....:         G = G.DirectProduct(A5)
-            ....:     return G
-            sage: G = A_5_to_n(7)
-            sage: g = G.minimum_generating_set()
-            sage: g
-            [(1,5,4,3,2)(8,9,10)(12,14,13)(17,19,18)(22,24,23)(27,29,28)(32,34,33),
-             (2,4,3)(6,8,10,7,9)(11,14,15,13,12)(16,19)(18,20)(21,25,24,22,23)(26,30,29,28,27)(31,35,34)]
-            sage: %timeit g = G.minimum_generating_set()
-            900 ms ± 90.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-            ```
+
+                sage: def A_5_to_n(n):
+                ....:     A5 = AlternatingGroup(5).gap()
+                ....:     G = A5
+                ....:     for i in range(n-1):
+                ....:         G = G.DirectProduct(A5)
+                ....:     return G
+                sage: G = A_5_to_n(7)
+                sage: g = G.minimum_generating_set()
+                sage: g
+                [(1,5,4,3,2)(8,9,10)(12,14,13)(17,19,18)(22,24,23)(27,29,28)(32,34,33),
+                 (2,4,3)(6,8,10,7,9)(11,14,15,13,12)(16,19)(18,20)(21,25,24,22,23)(26,30,29,28,27)(31,35,34)]
+                sage: %timeit g = G.minimum_generating_set()
+                900 ms ± 90.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
             """
             from sage.groups.libgap_mixin import minimum_generating_set
             return minimum_generating_set(self.gap())
-
 
     class ElementMethods:
         def conjugacy_class(self):
