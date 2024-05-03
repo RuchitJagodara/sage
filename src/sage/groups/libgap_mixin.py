@@ -1062,14 +1062,14 @@ def minimum_generating_set(G: GapElement) -> list:
           We'll refer to it as `g = \{g_1,g_2,\dots g_s\}`
           for convenience throughout this
           algorithm's description (but not in the code).
-          
+
         - ``G_by_Gim1`` --  The quotient Group `G / G_{i-1}`
-        
+
         - ``Gim1_by_Gi`` --  The quotinet Group `G_{i-1} / G_i`
-        
+
         - ``phi_G_by_Gi`` -- the natural homomorphism
           defining the cosets of `G_i` in `G`.
-          
+
         - ``phi_Gim1_by_Gi`` -- the natural homomorphism
           defining the cosets of `G_i` in `G_{i-1}`.
 
