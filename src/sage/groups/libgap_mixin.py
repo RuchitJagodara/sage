@@ -968,7 +968,6 @@ class GroupMixinLibGAP():
         """
         return self.gap().IsomorphismGroups(H.gap()) != libgap.fail
 
-
 def minimum_generating_set(G: GapElement) -> list:
     r"""
     INPUT:
