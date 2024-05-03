@@ -1004,7 +1004,7 @@ def minimum_generating_set(G: GapElement) -> list:
     ``g = libgap.MinimalGeneratingSet(GbyG1)``
 
     for k = 2 to `l` ,
-    compute `G/G_k` , `G_{k-1}/G_k` and set 
+    compute `G/G_k` , `G_{k-1}/G_k` and set
     `g := lift(g, (G_{k-1}/G_k) , (G/G_k) )`
 
     The `lift` function returns the
