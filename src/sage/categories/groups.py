@@ -452,8 +452,18 @@ class Groups(CategoryWithAxiom):
             return ConjugacyClass(self, g)
 
         def minimum_generating_set(self) -> list:
-            """
+            r"""
             Returns a the minimum generating set of this group.
+
+            EXAMPLES::
+
+                sage: P = PermutationGroup([(1,2,3,4,5),(3,4,5),(6,7,8,9,10),(8,9,10)]) # A group isomoprphic to A_5 ^ 2
+                sage: g = P.minimum_generating_set()
+                sage: len(g)
+                2
+                sage: P.gap() == libgap.GroupByGenerators(g)
+                True
+
             """
             from sage.groups.libgap_mixin import minimum_generating_set
             return minimum_generating_set(self.gap())
