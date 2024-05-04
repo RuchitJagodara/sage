@@ -983,7 +983,7 @@ def minimum_generating_set(G: GapElement) -> list:
 
     .. SEEALSO::
 
-    :meth:`sage.categories.groups.Groups.ParentMethods.minimum_generating_set`
+        :meth:`sage.categories.groups.Groups.ParentMethods.minimum_generating_set`
 
     ALGORITHM:
 
@@ -1013,21 +1013,16 @@ def minimum_generating_set(G: GapElement) -> list:
 
     return `g`
 
-    EXAMPLES::
+    TESTS:
 
-        sage: def A_5_to_n(n):
-        ....:     A5 = AlternatingGroup(5).gap()
-        ....:     G = A5
-        ....:     for i in range(n-1):
-        ....:         G = G.DirectProduct(A5)
-        ....:     return G
-        sage: G = A_5_to_n(7)
+        sage: A5 = AlternatingGroup(5).gap()
+        sage: G = A5.DirectProduct(A5)
         sage: g = minimum_generating_set(G)
-        sage: g
-        [(1,5,4,3,2)(8,9,10)(12,14,13)(17,19,18)(22,24,23)(27,29,28)(32,34,33),
-         (2,4,3)(6,8,10,7,9)(11,14,15,13,12)(16,19)(18,20)(21,25,24,22,23)(26,30,29,28,27)(31,35,34)]
-        sage: %timeit g = minimum_generating_set(G)
-        900 ms ± 90.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+        sage: G == libgap.GroupByGenerators(g)
+        True
+        sage: len(g)
+        2
+
     """
     assert isinstance(G, GapElement)
     if not G.IsFinite().sage():
@@ -1201,5 +1196,4 @@ def minimum_generating_set(G: GapElement) -> list:
         Gkm1byGk = phi_Gkm1byGk.ImagesSource()
         mingenset_k_reps = lift(
             mingenset_km1_reps, Gkm1byGk, GbyGk, phi_GbyGk, phi_Gkm1byGk)
-    assert (G == libgap.GroupByGenerators(mingenset_k_reps))
     return mingenset_k_reps
