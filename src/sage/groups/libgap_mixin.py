@@ -975,7 +975,7 @@ def minimum_generating_set(G: GapElement) -> list:
 
     INPUT:
 
-    - ``G`` -- a finite group
+    - ``G`` -- a group
 
     OUTPUT:
 
