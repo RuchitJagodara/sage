@@ -979,7 +979,7 @@ def minimum_generating_set(G: GapElement) -> list:
 
     OUTPUT:
 
-    - a minimum generating set of ``G``
+    A list of GAP objects that generate the group.
 
     .. SEEALSO::
 
