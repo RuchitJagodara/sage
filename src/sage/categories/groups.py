@@ -453,7 +453,7 @@ class Groups(CategoryWithAxiom):
 
         def minimum_generating_set(self) -> list:
             r"""
-            Returns a the minimum generating set of this group.
+            Returns a list of the minimum generating set of this group.
 
             EXAMPLES::
 
