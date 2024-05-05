@@ -1005,15 +1005,70 @@ def minimum_generating_set(G: GapElement) -> list:
     compute `G/G_k` , `G_{k-1}/G_k` and set
     `g := lift(g, (G_{k-1}/G_k) , (G/G_k) )`
 
-    The `lift` function returns the
-    (representatives of) minimum gnerating set
-    of `G/G_k` given the (representatives of)
-    minimum generating set of `G/G_{k-1}`.
-    It is discussed later when it is encountered in code.
-
     return `g`
 
-    TESTS:
+    #### `lift` function details:
+
+    It computes the minimum generating set
+    (as representative elements) of
+    a quotient group `G/G_i`
+    in a chief series,
+    given the minimum generating set
+    (as representatives) of `G/G_{i-1}`,
+    namely `g` (what we are calling
+    ``G_by_Gim1_mingen_reps`` in the code).
+    the factor group `G_{i-1}/G_i` and
+    the quotient group `G/G_i` itself.
+    The function does these steps:
+
+    First, we compute some essential quantities:
+
+    `\bold{n} :=\{n_1,n_2\dots n_k\}`
+    where `\{n_1 G_i,n_2G_i \dots n_kG_{i}\}`
+    is any generating set of `G_{i-1}/G_i ,
+    i.e. it's the representative elements of
+    any (prefferably small,
+    but not necessarily minimal)
+    generating set of `G_{i-1}/G_i`
+
+    `\bold{N} := \{N_1,N_2\dots N_m\}` where
+    `G_{i-1}/G_i = \{N_1G_i,N_2G_2\dots N_m G_m\}`.
+    This is simply a list of
+    representative elements of `G_{i-1}/G_i`.
+
+    We wish to find the representatives of
+    a minimum generating set of `G/G_i`.
+    Here, we have two cases to consider.
+
+    First, if `G_{i-1}/G_i` is abelian :
+
+    if `\braket{gG_i}= G/G_i`, return `g`
+
+    for `1 \le p \le s`  and `n_j \in \bold{n}`, we calculate
+    `g^* := \{g_1,g_2\dots g_{p-1} ,g_p n_j,g_{p_1},\dots\}`.
+    If `\braket{g^* G_i} = G/G_i` , return `g^*`
+
+    Second, if `G_{i-1}` is not abelian:
+
+    First, for all combinations of
+    (not necessarily distinct) elements
+    `N_{i_1},N_{i_2}\dots N_{i_t} \in \bold{N}`,
+    Compute `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
+    `g_{i_t}N_t,g_{t+1}\dots g_s\}`.
+    If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
+
+    Then, for all combinations of
+    (not necessarily distinct) elements
+    `N_{i_1},N_{i_2}\dots N_{i_t} N_{i_{t+1}} \in \bold{N}`,
+    Compute `g^* =`
+    `\{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
+    `g_{i_t}N_t,g_{t+1}\dots g_s\}`.
+    (This is done using the ``gen_combinations`` generator)
+    If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
+
+    By now, we must have exhausted our search.
+
+    EXAMPLES::
 
         sage: A5 = AlternatingGroup(5).gap()
         sage: G = A5.DirectProduct(A5)
@@ -1040,90 +1095,7 @@ def minimum_generating_set(G: GapElement) -> list:
             Gim1_by_Gi: GapElement, G_by_Gi: GapElement,
             phi_G_by_Gi: GapElement, phi_Gim1_by_Gi: GapElement
     ) -> list:
-        r"""
-        Computes the minimum generating set
-        (as representative elements) of
-        a quotient group `G/G_i`
-        in a chief series,
-        given the minimum generating set
-        (as representatives) of `G/G_{i-1}`,
-        the factor group `G_{i-1}/G_i` and
-        the quotient group `G/G_i` itself.
 
-        INPUT:
-
-        - ``G_by_Gim1_mingen_reps`` -- representative elements
-          of the minimum generating set of `G/G_{i-1}`.
-          We'll refer to it as `g = \{g_1,g_2,\dots g_s\}`
-          for convenience throughout this
-          algorithm's description (but not in the code).
-
-        - ``G_by_Gim1`` --  The quotient Group `G / G_{i-1}`
-
-        - ``Gim1_by_Gi`` --  The quotinet Group `G_{i-1} / G_i`
-
-        - ``phi_G_by_Gi`` -- the natural homomorphism
-          defining the cosets of `G_i` in `G`.
-
-        - ``phi_Gim1_by_Gi`` -- the natural homomorphism
-          defining the cosets of `G_i` in `G_{i-1}`.
-
-        OUTPUT:
-
-        Representative elements of
-        the minimum generating set of `G / G_{i}`.
-
-        ALGORITHM:
-
-        First, we compute some essential quantities:
-
-        `\bold{n} :=\{n_1,n_2\dots n_k\}`
-        where `\{n_1 G_i,n_2G_i \dots n_kG_{i}\}`
-        is any generating set of `G_{i-1}/G_i ,
-        i.e. it's the representative elements of
-        any (prefferably small,
-        but not necessarily minimal)
-        generating set of `G_{i-1}/G_i`
-
-        `\bold{N} := \{N_1,N_2\dots N_m\}` where
-        `G_{i-1}/G_i = \{N_1G_i,N_2G_2\dots N_m G_m\}`.
-        This is simply a list of
-        representative elements of `G_{i-1}/G_i`.
-
-        We wish to find the representatives of
-        a minimum generating set of `G/G_i`.
-        Here, we have two cases to consider.
-
-        First, if `G_{i-1}/G_i` is abelian :
-
-        if `\braket{gG_i}= G/G_i`, return `g`
-
-        for `1 \le p \le s`  and `n_j \in \bold{n}`, we calculate
-        `g^* := \{g_1,g_2\dots g_{p-1} ,g_p n_j,g_{p_1},\dots\}`.
-        If `\braket{g^* G_i} = G/G_i` , return `g^*`
-
-        Second, if `G_{i-1}` is not abelian:
-
-        First, for all combinations of
-        (not necessarily distinct) elements
-        `N_{i_1},N_{i_2}\dots N_{i_t} \in \bold{N}`,
-        Compute `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
-        `g_{i_t}N_t,g_{t+1}\dots g_s\}`
-        (done using ``gen_combinations``).
-        If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
-
-        Then, for all combinations of
-        (not necessarily distinct) elements
-        `N_{i_1},N_{i_2}\dots N_{i_t} N_{i_{t+1}} \in \bold{N}`,
-        Compute `g^* =`
-        `\{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
-        `g_{i_t}N_t,g_{t+1}\dots g_s\}`
-        (done using ``gen_combinations``).
-        If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
-
-        By now, we must have exhausted our search.
-
-        """
         def gen_combinations(g: list, N: list, t: int):
             if t == 0:
                 yield g
