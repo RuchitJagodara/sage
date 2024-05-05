@@ -1108,7 +1108,8 @@ def minimum_generating_set(G: GapElement) -> list:
         (not necessarily distinct) elements
         `N_{i_1},N_{i_2}\dots N_{i_t} \in \bold{N}`,
         Compute `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
-        `g_{i_t}N_t,g_{t+1}\dots g_s\}`.
+        `g_{i_t}N_t,g_{t+1}\dots g_s\}`
+        (done using ``gen_combinations``).
         If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
 
         Then, for all combinations of
@@ -1116,26 +1117,14 @@ def minimum_generating_set(G: GapElement) -> list:
         `N_{i_1},N_{i_2}\dots N_{i_t} N_{i_{t+1}} \in \bold{N}`,
         Compute `g^* =`
         `\{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
-        `g_{i_t}N_t,g_{t+1}\dots g_s\}`.
+        `g_{i_t}N_t,g_{t+1}\dots g_s\}`
+        (done using ``gen_combinations``).
         If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
 
         By now, we must have exhausted our search.
 
         """
         def gen_combinations(g: list, N: list, t: int):
-            r"""
-            Generates all modifications to `g` of form
-            `g^* = \{g_1 N_1,g_2 N_2 \dots g_t N_t , g_{t+1}, g_{t+2} \dots\}`
-
-            INPUT:
-
-                - ``g`` -- a list of elements from some group `G`
-
-                - ``N`` -- a list of elements of
-                  normal subgroup `N` of `G`
-
-                - ``t`` -- the index till which to modify ``g``
-            """
             if t == 0:
                 yield g
                 return
@@ -1145,6 +1134,7 @@ def minimum_generating_set(G: GapElement) -> list:
                     gm[t-1] = old * n
                     yield gm
                     gm[t-1] = old
+
         s = len(G_by_Gim1_mingen_reps)
         Gim1_by_Gi_L = list(Gim1_by_Gi.AsList())
         Gim1_by_Gi_elem_reps = [
@@ -1157,21 +1147,21 @@ def minimum_generating_set(G: GapElement) -> list:
                 [phi_G_by_Gi.ImagesRepresentative(x)
                  for x in G_by_Gim1_mingen_reps])):
                 return G_by_Gim1_mingen_reps
-                
+
             for i in range(s):
                 for j in range(len(Gim1_by_Gi_gen_reps)):
                     temp = G_by_Gim1_mingen_reps[i]
                     G_by_Gim1_mingen_reps[i] = G_by_Gim1_mingen_reps[i] * \
                         Gim1_by_Gi_gen_reps[j]
-                        
+
                     if (G_by_Gi == libgap.GroupByGenerators(
                         [phi_G_by_Gi.ImagesRepresentative(x)
                          for x in G_by_Gim1_mingen_reps])):
                         return G_by_Gim1_mingen_reps
                     G_by_Gim1_mingen_reps[i] = temp
-                    
+
             return G_by_Gim1_mingen_reps + [Gim1_by_Gi_gen_reps[0]]
-            
+
         for raw_gens in gen_combinations(
                 G_by_Gim1_mingen_reps,
                 Gim1_by_Gi_elem_reps, s):
@@ -1179,6 +1169,7 @@ def minimum_generating_set(G: GapElement) -> list:
                 [phi_G_by_Gi.ImagesRepresentative(x)
                  for x in raw_gens])):
                 return raw_gens
+
         for raw_gens in gen_combinations(
                 G_by_Gim1_mingen_reps+[Gim1_by_Gi_elem_reps[0]],
                 Gim1_by_Gi_elem_reps, s+1):
@@ -1186,12 +1177,13 @@ def minimum_generating_set(G: GapElement) -> list:
                 [phi_G_by_Gi.ImagesRepresentative(x)
                  for x in raw_gens])):
                 return raw_gens
+
     cs = G.ChiefSeries()
     phi_GbyG1 = G.NaturalHomomorphismByNormalSubgroup(cs[1])
     GbyG1 = phi_GbyG1.ImagesSource()
     mingenset_k_reps = [phi_GbyG1.PreImagesRepresentative(x) for x in list(
         libgap.SmallGeneratingSet(GbyG1))]  # k=1 initially
-        
+
     for k in range(2, len(cs)):
         mingenset_km1_reps = mingenset_k_reps
         Gk, Gkm1 = cs[k], cs[k-1]
@@ -1201,5 +1193,5 @@ def minimum_generating_set(G: GapElement) -> list:
         Gkm1byGk = phi_Gkm1byGk.ImagesSource()
         mingenset_k_reps = lift(
             mingenset_km1_reps, Gkm1byGk, GbyGk, phi_GbyGk, phi_Gkm1byGk)
-            
+
     return mingenset_k_reps
