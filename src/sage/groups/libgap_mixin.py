@@ -1157,17 +1157,21 @@ def minimum_generating_set(G: GapElement) -> list:
                 [phi_G_by_Gi.ImagesRepresentative(x)
                  for x in G_by_Gim1_mingen_reps])):
                 return G_by_Gim1_mingen_reps
+                
             for i in range(s):
                 for j in range(len(Gim1_by_Gi_gen_reps)):
                     temp = G_by_Gim1_mingen_reps[i]
                     G_by_Gim1_mingen_reps[i] = G_by_Gim1_mingen_reps[i] * \
                         Gim1_by_Gi_gen_reps[j]
+                        
                     if (G_by_Gi == libgap.GroupByGenerators(
                         [phi_G_by_Gi.ImagesRepresentative(x)
                          for x in G_by_Gim1_mingen_reps])):
                         return G_by_Gim1_mingen_reps
                     G_by_Gim1_mingen_reps[i] = temp
+                    
             return G_by_Gim1_mingen_reps + [Gim1_by_Gi_gen_reps[0]]
+            
         for raw_gens in gen_combinations(
                 G_by_Gim1_mingen_reps,
                 Gim1_by_Gi_elem_reps, s):
