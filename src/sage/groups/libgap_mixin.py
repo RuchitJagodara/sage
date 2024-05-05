@@ -970,7 +970,7 @@ class GroupMixinLibGAP():
 
 def minimum_generating_set(G: GapElement) -> list:
     r"""
-    Returns the minimum generating
+    Returns a list of the minimum generating set of group ``G``
     set of group G.
 
     INPUT:
