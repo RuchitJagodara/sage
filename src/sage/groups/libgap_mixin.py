@@ -1187,6 +1187,7 @@ def minimum_generating_set(G: GapElement) -> list:
     GbyG1 = phi_GbyG1.ImagesSource()
     mingenset_k_reps = [phi_GbyG1.PreImagesRepresentative(x) for x in list(
         libgap.SmallGeneratingSet(GbyG1))]  # k=1 initially
+        
     for k in range(2, len(cs)):
         mingenset_km1_reps = mingenset_k_reps
         Gk, Gkm1 = cs[k], cs[k-1]
@@ -1196,4 +1197,5 @@ def minimum_generating_set(G: GapElement) -> list:
         Gkm1byGk = phi_Gkm1byGk.ImagesSource()
         mingenset_k_reps = lift(
             mingenset_km1_reps, Gkm1byGk, GbyGk, phi_GbyGk, phi_Gkm1byGk)
+            
     return mingenset_k_reps
