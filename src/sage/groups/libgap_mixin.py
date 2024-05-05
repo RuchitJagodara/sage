@@ -970,16 +970,15 @@ class GroupMixinLibGAP():
 
 def minimum_generating_set(G: GapElement) -> list:
     r"""
-    Returns a list of the minimum generating set of group ``G``
-    set of group G.
+    returns a list with minimum length of elements of `G` that generate `G`.
 
     INPUT:
 
-    - ``G`` -- a group
+        - ``G`` -- a group
 
     OUTPUT:
 
-    A list of GAP objects that generate the group.
+        - a minimum generating set of ``G`` as a list
 
     .. SEEALSO::
 
@@ -989,55 +988,42 @@ def minimum_generating_set(G: GapElement) -> list:
 
     First we cover the cases when we can use the ``MinimalGeneratingSet``
     method of GAP directly. This happens when `G` is either Simple,
-    or Solvable, or Nilpotent.
-    Then, if ``libgap.MinimalGeneratingSet`` fails, we proceed assuming
-    that `G` is not a simple group.
+    or Solvable, or Nilpotent. Then, if ``libgap.MinimalGeneratingSet``
+    fails, we proceed assuming that `G` is not a simple group.
     So, we are guaranteed to find a chief series of length at least 2.
 
     `S := ChiefSeries(G) = [G,G_1,G_2 \dots G_l]` where `G_l = \{e\}`
 
-    Let `g` be the set of representatives of
-    the minimum generating set of `G/G_1`.
-    This can be found easily (since `G/G_1` is simple group) as
-    ``g = libgap.MinimalGeneratingSet(GbyG1)``
+    Let `g` be the set of representatives of the minimum generating set
+    of `G/G_1`. This can be found easily (since `G/G_1` is simple group)
+    as ``g = libgap.MinimalGeneratingSet(GbyG1)``
 
-    for k = 2 to `l` ,
-    compute `G/G_k` , `G_{k-1}/G_k` and set
-    `g := lift(g, (G_{k-1}/G_k) , (G/G_k) )`
+    for k = 2 to `l` , compute `G/G_k` , `G_{k-1}/G_k` and set
+    `g := lift( g, (G_{k-1}/G_k) , (G/G_k) )`
 
     return `g`
 
     #### `lift` function details:
 
-    It computes the minimum generating set
-    (as representative elements) of
-    a quotient group `G/G_i`
-    in a chief series,
-    given the minimum generating set
-    (as representatives) of `G/G_{i-1}`,
-    namely `g` (what we are calling
-    ``G_by_Gim1_mingen_reps`` in the code).
-    the factor group `G_{i-1}/G_i` and
-    the quotient group `G/G_i` itself.
+    It computes the minimum generating set (as representative elements) of
+    a quotient group `G/G_i` in a chief series, given the
+    minimum generating set (as representatives) of `G/G_{i-1}`, namely `g`
+    (what we are calling ``G_by_Gim1_mingen_reps`` in the code).
+    the factor group `G_{i-1}/G_i` and the quotient group `G/G_i` itself.
     The function does these steps:
 
     First, we compute some essential quantities:
 
     `\bold{n} :=\{n_1,n_2\dots n_k\}`
-    where `\{n_1 G_i,n_2G_i \dots n_kG_{i}\}`
-    is any generating set of `G_{i-1}/G_i ,
-    i.e. it's the representative elements of
-    any (prefferably small,
-    but not necessarily minimal)
-    generating set of `G_{i-1}/G_i`
+    where `\{n_1 G_i,n_2G_i \dots n_kG_{i}\}` is any generating set of
+    `G_{i-1}/G_i , i.e. it's the representative elements of any prefferably
+    small, but not necessarily minimal generating set of `G_{i-1}/G_i`
 
     `\bold{N} := \{N_1,N_2\dots N_m\}` where
     `G_{i-1}/G_i = \{N_1G_i,N_2G_2\dots N_m G_m\}`.
-    This is simply a list of
-    representative elements of `G_{i-1}/G_i`.
+    This is simply a list of representative elements of `G_{i-1}/G_i`.
 
-    We wish to find the representatives of
-    a minimum generating set of `G/G_i`.
+    We wish to find the representatives of a minimum generating set of `G/G_i`.
     Here, we have two cases to consider.
 
     First, if `G_{i-1}/G_i` is abelian :
@@ -1050,20 +1036,16 @@ def minimum_generating_set(G: GapElement) -> list:
 
     Second, if `G_{i-1}` is not abelian:
 
-    First, for all combinations of
-    (not necessarily distinct) elements
-    `N_{i_1},N_{i_2}\dots N_{i_t} \in \bold{N}`,
-    Compute `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
-    `g_{i_t}N_t,g_{t+1}\dots g_s\}`.
+    First, for all combinations of (not necessarily distinct) elements
+    `N_{i_1},N_{i_2}\dots N_{i_t} \in \bold{N}`, compute
+    `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}\dots g_{i_t}N_t,g_{t+1}\dots g_s\}`
+    (This is done using the ``gen_combinations`` generator).
     If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
 
-    Then, for all combinations of
-    (not necessarily distinct) elements
-    `N_{i_1},N_{i_2}\dots N_{i_t} N_{i_{t+1}} \in \bold{N}`,
-    Compute `g^* =`
-    `\{g_1N_{i_1},g_{i_2}N_{i_3}\dots`
-    `g_{i_t}N_t,g_{t+1}\dots g_s\}`.
-    (This is done using the ``gen_combinations`` generator)
+    Then, for all combinations of (not necessarily distinct) elements
+    `N_{i_1},N_{i_2}\dots N_{i_t} N_{i_{t+1}} \in \bold{N}`, compute
+    `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}\dots g_{i_t}N_t,g_{t+1}\dots g_s\}`
+    (This is done using the ``gen_combinations`` generator).
     If `\braket{g^*G_i}\; = G/G_i`, return `{g^*}`
 
     By now, we must have exhausted our search.
