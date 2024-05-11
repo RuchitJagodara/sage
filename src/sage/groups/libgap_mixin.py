@@ -999,7 +999,7 @@ def minimum_generating_set(G) -> list:
     `S := ChiefSeries(G) = [G,G_1,G_2 ... G_l]` where `G_l = \{ e \}`
 
     Let `g` be the set of representatives of the minimum generating set of `G/G_1`.
-    This can be found easily (since `G/G_1` is simple group) as 
+    This can be found easily (since `G/G_1` is simple group) as
     ``g = libgap.MinimalGeneratingSet(GbyG1)``
 
     for k = 2 to `l` , compute `G/G_k` , `G_{k-1}/G_k` and set `g := lift( g, (G_{k-1}/G_k) , (G/G_k) )`
@@ -1085,7 +1085,7 @@ def minimum_generating_set(G) -> list:
         return list(G.MinimalGeneratingSet())
     except (AttributeError, ValueError, TypeError):
         pass
-    
+
     def gen_combinations(g, N, t):
         if t == 0:
             yield g
@@ -1126,7 +1126,7 @@ def minimum_generating_set(G) -> list:
                                                      for x in raw_gens])):
                 return raw_gens
 
-        for raw_gens in gen_combinations(G_by_Gim1_mingen_reps+[Gim1_by_Gi_elem_reps[0]], 
+        for raw_gens in gen_combinations(G_by_Gim1_mingen_reps+[Gim1_by_Gi_elem_reps[0]],
                                          Gim1_by_Gi_elem_reps, s+1):
             if (G_by_Gi == libgap.GroupByGenerators([phi_G_by_Gi.ImagesRepresentative(x)
                                                      for x in raw_gens])):
