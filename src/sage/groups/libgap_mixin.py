@@ -996,32 +996,32 @@ def minimum_generating_set(G) -> list:
     If the MinimalGeneratingSet function of GAP gives any error, then it is guaranteed
     that the group ``G`` is not a simple group and it will have a cheif series of length 2.
 
-    `S := ChiefSeries(G) = [G,G_1,G_2 ... G_l]` where `G_l = \{ e \}`
+    S := ChiefSeries(G) = [`G,G_1,G_2 ... G_l`] where `G_l` = { e }
 
-    Let `g` be the set of representatives of the minimum generating set of `G/G_1`.
+    Let 'g' be the set of representatives of the minimum generating set of `G/G_1`.
     This can be found easily (since `G/G_1` is simple group) as
     ``g = libgap.MinimalGeneratingSet(GbyG1)``
 
-    for k = 2 to `l` , compute `G/G_k` , `G_{k-1}/G_k` and set `g := lift( g, (G_{k-1}/G_k) , (G/G_k) )`
+    for k = 2 to l , compute `G/G_k` , `G_{k-1}/G_k` and set g := lift( g, (`G_{k-1}/G_k`) , (`G/G_k`) )
 
-    return `g`
+    return g
 
     lift function details:
 
     It computes the minimum generating set (as representative elements) of a quotient group `G/G_i`
-    in a chief series, given the minimum generating set (as representatives) of `G/G_{i-1}`, namely `g`
-    (what we are calling ``G_by_Gim1_mingen_reps`` in the code). the factor group `G_{i-1}/G_i`
+    in a chief series, given the minimum generating set (as representatives) of `G/G_{i-1}`, namely g
+    (what we are calling ``G_by_Gim1_mingen_reps`` in the code), the factor group `G_{i-1}/G_i`,
     and the quotient group `G/G_i` itself. The function does these steps:
 
     First, we compute some essential quantities:
 
-    `n :=\{ n_1,n_2 ... n_k \}`
-    where `\{ n_1 G_i,n_2 G_i ... n_k G_i \}` is any generating set of
+    n := { `n_1,n_2` ... `n_k` }
+    where { `n_1 G_i,n_2 G_i ... n_k G_i` } is any generating set of
     `G_{i-1}/G_i` , i.e. it's the representative elements of any prefferably
     small, but not necessarily minimal generating set of `G_{i-1}/G_i`
 
-    `N := \{ N_1,N_2 ... N_m \}` where
-    `G_{i-1}/G_i = \{N_1 G_i,N_2 G_2 ... N_m G_m \}`.
+    N := { `N_1,N_2 ... N_m` } where
+    `G_{i-1}/G_i` = {`N_1 G_i,N_2 G_2 ... N_m G_m` }.
     This is simply a list of representative elements of `G_{i-1}/G_i`.
 
     We wish to find the representatives of a minimum generating set of `G/G_i`.
@@ -1029,24 +1029,25 @@ def minimum_generating_set(G) -> list:
 
     First, if `G_{i-1}/G_i` is abelian :
 
-    if `<gG_i> = G/G_i`, return `g`
+    if {`g G_i`] generates `G/G_i`, return g
 
-    for `0 < p < s+1`  and `n_j` in `n`, we calculate
-    `g^* := \{ g_1,g_2 ... g_{p-1} ,g_p n_j,g_{p_1}, ... \}`. If `<g^* G_i> = G/G_i`, return `g^*`
+    for 0 < p < s+1  and `n_j` in n, we calculate
+    `g^*` := { `g_1,g_2 ... g_{p-1} ,g_p n_j,g_{p_1},` ... }.
+    If {`g^* G_i`} generates `G/G_i`, return `g^*`
 
     Second, if `G_{i-1}` is not abelian:
 
     First, for all combinations of (not necessarily distinct) elements
-    `N_{i_1},N_{i_2}... N_{i_t}` in `N`, compute
-    `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}... g_{i_t}N_t,g_{t+1}... g_s\}`
+    `N_{i_1},N_{i_2}... N_{i_t}` in N, compute
+    `g^*` := {`g_1N_{i_1},g_{i_2}N_{i_3}`... `g_{i_t}N_t,g_{t+1}`... `g_s`}
     (This is done using the ``gen_combinations`` generator).
-    If `\{x G_i | x \in g^* \}` generates `G/G_i`, return `g^*`
+    If {`x G_i` | x is in `g^*` } generates `G/G_i`, return `g^*`
 
     Then, for all combinations of (not necessarily distinct) elements
-    `N_{i_1},N_{i_2}... N_{i_t} N_{i_{t+1}}` in `N`, compute
-    `g^* = \{g_1N_{i_1},g_{i_2}N_{i_3}... g_{i_t}N_t,g_{t+1}... g_s\}`
+    `N_{i_1},N_{i_2}... N_{i_t} N_{i_{t+1}}` in N, compute
+    `g^*` := {`g_1N_{i_1},g_{i_2}N_{i_3}`... `g_{i_t}N_t,g_{t+1}`... `g_s`}
     (This is done using the ``gen_combinations`` generator).
-    If `\{x G_i | x \in g^* \}` generates `G/G_i`, return `g^*`
+    If {`x G_i` | x is in `g^*`} generates `G/G_i`, return `g^*`
 
     By now, we must have exhausted our search.
 
