@@ -1009,8 +1009,9 @@ def minimum_generating_set(G) -> list:
     lift function details:
 
     It computes the minimum generating set (as CR) of the quotient of ``G`` with a normal subgroup ``Gi``
-    in a chief series, given the MGS (as CR) of the quotient of ``G`` with the normal group ``Gim1`` just larger than it.
-    This MGS (as CR) are what we are calling ``G_by_Gim1_mingen_reps`` in the code) and what we'll call 'g' here.
+    in a chief series, given the MGS (as CR) of the quotient of ``G``
+    with the normal group ``Gim1`` just larger than ``Gi``.
+    This MGS (as CR) are what we are calling ``G_by_Gim1_mingen_reps`` in the code) and call 'g' here.
     The function does these steps:
 
     First, we compute some essential quantities:
@@ -1018,7 +1019,7 @@ def minimum_generating_set(G) -> list:
     'n' is a list of CR of any (prefferably small, but not necessarily minimal) generating set of
     the factor group ``Gim1_by_Gi`` of the two normal subgroups.
 
-    `N` is simply a list of CR of that factor group.
+    'N' is simply a list of CR of that factor group.
 
     Here, we have two cases to consider.
 
